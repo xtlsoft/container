@@ -8,7 +8,13 @@ func main() {
 
 	ns := container.NewNS()
 
-	ns.ApplyUTS().SetPS1("-[Hello Namespace]-")
+	ns.ApplyUTS().
+		ApplyUser().
+		ApplyPID().
+		ApplyMount().
+		ApplyNet().
+		ApplyIPC().
+		SetPS1("-[Hello Namespace]-")
 
 	cmd := ns.Command("bash")
 

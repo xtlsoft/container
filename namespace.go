@@ -30,6 +30,46 @@ func (ns *Namespace) ApplyUTS() *Namespace {
 
 }
 
+func (ns *Namespace) ApplyUser() *Namespace {
+
+	ns.Cloneflags = ns.Cloneflags | syscall.CLONE_NEWUSER
+
+	return ns
+
+}
+
+func (ns *Namespace) ApplyMount() *Namespace {
+
+	ns.Cloneflags = ns.Cloneflags | syscall.CLONE_NEWNS
+
+	return ns
+
+}
+
+func (ns *Namespace) ApplyNet() *Namespace {
+
+	ns.Cloneflags = ns.Cloneflags | syscall.CLONE_NEWNET
+
+	return ns
+
+}
+
+func (ns *Namespace) ApplyPID() *Namespace {
+
+	ns.Cloneflags = ns.Cloneflags | syscall.CLONE_NEWPID
+
+	return ns
+
+}
+
+func (ns *Namespace) ApplyIPC() *Namespace {
+
+	ns.Cloneflags = ns.Cloneflags | syscall.CLONE_NEWIPC
+
+	return ns
+
+}
+
 func (ns *Namespace) SetPS1(name string) *Namespace {
 
 	ns.P_PS1 = name
