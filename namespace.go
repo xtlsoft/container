@@ -11,6 +11,8 @@ func NewNS() *Namespace {
 
 	ns := new(Namespace)
 
+	ns.P_UID = -1;
+
 	return ns
 
 }
@@ -19,6 +21,8 @@ type Namespace struct {
 
 	Cloneflags uintptr
 	P_PS1 string
+	P_UID int
+	P_GID int
 
 }
 
@@ -32,7 +36,21 @@ func (ns *Namespace) ApplyUTS() *Namespace {
 
 func (ns *Namespace) ApplyUser() *Namespace {
 
+	if ns.P_UID == -1 {
+		P_UID = os.Getuid()
+		P_GID = os.Getgid()
+	}
+
 	ns.Cloneflags = ns.Cloneflags | syscall.CLONE_NEWUSER
+
+	return ns
+
+}
+
+func (ns *Namespace) SetUID(uid int, gid int) *Namespace {
+
+	ns.P_UID = uid
+	ns.P_GID = gid
 
 	return ns
 
@@ -92,6 +110,23 @@ func (ns *Namespace) Command(cmdl string, arg ...string) *exec.Cmd {
 
 	cmd.SysProcAttr = &syscall.SysProcAttr {
 		Cloneflags: ns.Cloneflags,
+	}
+
+	if ns.P_UID != -1 {
+		cmd.SysProcAttr.UidMappings = []syscall.SysProcIDMap{
+			{
+				ContainerID: 0,
+				HostID: ns.P_UID,
+				Size: 1,
+			},
+		}
+		cmd.SysProcAttr.GidMappings = []syscall.SysProcIDMap{
+			{
+				ContainerID: 0,
+				HostID: ns.P_GID,
+				Size: 1,
+			},
+		}
 	}
 
 	return cmd
