@@ -37,8 +37,8 @@ func (ns *Namespace) ApplyUTS() *Namespace {
 func (ns *Namespace) ApplyUser() *Namespace {
 
 	if ns.P_UID == -1 {
-		P_UID = os.Getuid()
-		P_GID = os.Getgid()
+		ns.P_UID = os.Getuid()
+		ns.P_GID = os.Getgid()
 	}
 
 	ns.Cloneflags = ns.Cloneflags | syscall.CLONE_NEWUSER
