@@ -9,7 +9,7 @@ import (
 // Please import github.com/containerd/cgroups .
 // This is only a wrapper of some useful functions.
 
-func NewOrLoadCgroups(hierarchy cgroups.Hierarchy, path cgroups.Path, resources specs.LinuxResources) (cgroups.Cgroup, error) {
+func NewOrLoadCgroups(hierarchy cgroups.Hierarchy, path cgroups.Path, resources *specs.LinuxResources) (cgroups.Cgroup, error) {
 
 	// Try load...
 	rslt, err := cgroups.Load(hierarchy, path)
