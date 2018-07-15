@@ -4,6 +4,7 @@ import (
 	"syscall"
 	"fmt"
 	"os/exec"
+	"os"
 )
 
 func NewNS() *Namespace {
@@ -17,7 +18,7 @@ func NewNS() *Namespace {
 type Namespace struct {
 
 	Cloneflags uintptr
-	UTSHostname string
+	P_PS1 string
 
 }
 
@@ -29,9 +30,9 @@ func (ns *Namespace) ApplyUTS() *Namespace {
 
 }
 
-func (ns *Namespace) SetUTSHostName(name string) *Namespace {
+func (ns *Namespace) SetPS1(name string) *Namespace {
 
-	ns.UTSHostname = name
+	ns.P_PS1 = name
 
 	return ns
 
@@ -41,10 +42,28 @@ func (ns *Namespace) Command(cmdl string, arg ...string) *exec.Cmd {
 
 	cmd := exec.Command(cmdl, arg...)
 
-	cmd.Env = []string{fmt.Sprintf("PS1=%s # ", ns.UTSHostname)}
+	var env []string
+
+	if ns.P_PS1 != "" {
+		env = append(env, fmt.Sprintf("PS1=%s # ", ns.P_PS1))
+	}
+
+	cmd.Env = env
 
 	cmd.SysProcAttr = &syscall.SysProcAttr {
 		Cloneflags: ns.Cloneflags,
 	}
+
+	return cmd
+
+}
+
+func (ns *Namespace) RedirectStd(cmd *exec.Cmd) *exec.Cmd {
+
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	return cmd
 
 }

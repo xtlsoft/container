@@ -1,15 +1,17 @@
 package main
 
 import (
-	container "../../Container"
+	container ".."
 )
 
 func main() {
 
 	ns := container.NewNS()
 
-	ns.ApplyUTS().SetUTSHostname("-[Hello Namespace]-")
+	ns.ApplyUTS().SetPS1("-[Hello Namespace]-")
 
-	ns.Exec("bash").Run()
+	cmd := ns.Command("bash")
+
+	ns.RedirectStd(cmd).Run()
 
 }
