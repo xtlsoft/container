@@ -28,18 +28,22 @@ func main() {
 	cmd := container.NewInitProcess(ns, true, "sh")
 
 	var shares uint64 = 100
-	var quota int64 = 100
-	var limit int64 = 10 * 1024 * 1024
+	// var quota int64 = 100
+	// var limit int64 = 10 * 1024 * 1024
 
-	cgroup, _ := container.NewOrLoadCgroups(cgroups.V1, cgroups.StaticPath("/test01"), &specs.LinuxResources{
+	cgroup, err := container.NewOrLoadCgroups(cgroups.V1, cgroups.StaticPath("/test01"), &specs.LinuxResources{
 		CPU: &specs.LinuxCPU{
 			Shares: &shares,
-			Quota: &quota,
+			// Quota: &quota,
 		},
 		Memory: &specs.LinuxMemory{
-			Limit: &limit,
+			// Limit: &limit,
 		},
 	})
+
+	if err != nil {
+		panic(err)
+	}
 
 	defer cgroup.Delete()
 
