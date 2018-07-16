@@ -4,14 +4,22 @@ import (
 	container ".."
 	"github.com/containerd/cgroups"
 	specs "github.com/opencontainers/runtime-spec/specs-go"
+	"os"
+	"fmt"
 )
 
 func main() {
 
 	if container.IsInitProcess() {
 		container.InitProcessChannel <- func(cmd string, args []string) {
+			fmt.Println("Starting From This")
 			container.MountBasicFileSystems()
 		}
+		return
+	}
+
+	if len(os.Args) > 1 && os.Args[1] == "new" {
+		fmt.Println("Hello!")
 		return
 	}
 
@@ -25,7 +33,7 @@ func main() {
 		ApplyIPC().
 		SetPS1("-[Hello Namespace]-")
 
-	cmd := container.NewInitProcess(ns, true, "sh")
+	cmd := container.NewInitProcess(ns, true, "/proc/self/exe", "new")
 
 	var shares uint64 = 100
 	// var quota int64 = 100
@@ -46,6 +54,8 @@ func main() {
 	}
 
 	defer cgroup.Delete()
+
+	cmd = ns.RedirectStd(cmd)
 
 	cmd.Start()
 
