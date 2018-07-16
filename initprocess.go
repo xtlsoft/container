@@ -47,12 +47,15 @@ func init() {
 			callback := <- InitProcessChannel
 
 			// Call the function
-			callback(command, args)
+			wg := callback(command, args)
+			wg.Add(1)
 
 			// Do execve
 			if err := syscall.Exec(command, args, os.Environ()); err != nil {
 				log.Fatalf("Initialize error: %v", err)
 			}
+
+			wg.Done()
 
 		}()
 

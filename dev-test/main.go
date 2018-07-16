@@ -6,15 +6,19 @@ import (
 	specs "github.com/opencontainers/runtime-spec/specs-go"
 	"os"
 	"fmt"
+	"sync"
 )
 
 func main() {
 
 	if container.IsInitProcess() {
-		container.InitProcessChannel <- func(cmd string, args []string) {
+		wg := new(sync.WaitGroup)
+		container.InitProcessChannel <- func(cmd string, args []string) *sync.WaitGroup {
 			fmt.Println("Starting From This")
 			container.MountBasicFileSystems()
+			return wg
 		}
+		wg.Wait()
 		return
 	}
 
