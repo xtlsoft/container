@@ -7,10 +7,12 @@ import (
 	"syscall"
 )
 
+var InitProcessChannel = make(chan func(string, []string))
+
 // Schedule Init Process
 func init() {
 
-	if os.Args[1] == "_container_init_" {
+	if len(os.Args) > 1 && os.Args[1] == "_container_init_" {
 
 		// Do schedule
 		// WIP
@@ -25,15 +27,23 @@ func init() {
 		}
 
 		// Mount proc filesystem
-		defaultMountFlags := syscall.MS_NOEXEC | syscall.MS_NOSUID | syscall.MS_NODEV
-		syscall.Mount("proc", "/proc", "proc", uintptr(defaultMountFlags), "")
+		// defaultMountFlags := syscall.MS_NOEXEC | syscall.MS_NOSUID | syscall.MS_NODEV
+		// syscall.Mount("proc", "/proc", "proc", uintptr(defaultMountFlags), "")
 
-		// Do execve
-		if err := syscall.Exec(command, args, os.Environ()); err != nil {
+		go func() {
 
-			log.Fatalf("Initialize error: %v", err)
+			// Get the process function
+			callback := <- InitProcessChannel
 
-		}
+			// Call the function
+			callback(command, args)
+
+			// Do execve
+			if err := syscall.Exec(command, args, os.Environ()); err != nil {
+				log.Fatalf("Initialize error: %v", err)
+			}
+
+		}()
 
 	}
 
