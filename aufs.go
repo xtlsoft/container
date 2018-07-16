@@ -114,13 +114,17 @@ func (aufs *AUFS) WriteConfig() *AUFS {
 
 }
 
-func (aufs *AUFS) Mount(topLayer string, path string) error {
+func (aufs *AUFS) Mount(topLayer string, path string, additionalLayers ...string) error {
 
 	var layers []string
 	layers = append(layers, topLayer)
 
+	for _, v := range additionalLayers {
+		layers = append(layers, v)
+	}
+
 	for _, v := range aufs.Config.ImageLayers {
-		layers = append(layers, topLayer)
+		layers = append(layers, v)
 	}
 
 	var layerArgs = strings.Join(layers, ":")
