@@ -7,8 +7,6 @@ import (
 	"syscall"
 )
 
-var InitProcessChannel = make(chan func(string, []string))
-
 func IsInitProcess() bool {
 
 	return len(os.Args) > 1 && os.Args[1] == "_container_init_"
@@ -25,42 +23,30 @@ func MountBasicFileSystems() {
 }
 
 // Schedule Init Process
-func init() {
+func ParseInit() (command string, args []string) {
 
-	if len(os.Args) > 1 && os.Args[1] == "_container_init_" {
+	command = os.Args[2]
 
-		// Do schedule
-		// WIP
-		command := os.Args[2]
+	for i := 2; i < len(os.Args); i ++ {
 
-		var args []string
-
-		for i := 2; i < len(os.Args); i ++ {
-
-			args = append(args, os.Args[i])
-
-		}
-
-		go func() {
-
-			// Get the process function
-			callback := <- InitProcessChannel
-
-			// Call the function
-			wg := callback(command, args)
-			wg.Add(1)
-
-			// Do execve
-			if err := syscall.Exec(command, args, os.Environ()); err != nil {
-				log.Fatalf("Initialize error: %v", err)
-			}
-
-			wg.Done()
-
-		}()
+		args = append(args, os.Args[i])
 
 	}
 
+	return
+
+}
+
+func Execve(command string, args []string, env ...[]string) {
+	var environ []string
+	if len(env) == 1 {
+		environ = env[0]
+	} else {
+		environ = os.Environ()
+	}
+	if err := syscall.Exec(command, args, environ); err != nil {
+		log.Fatalf("Initialize error: %v", err)
+	}
 }
 
 func NewInitProcess(ns *Namespace, tty bool, command string, arguments ...string) *exec.Cmd {
