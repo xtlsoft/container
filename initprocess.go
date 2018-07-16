@@ -9,6 +9,21 @@ import (
 
 var InitProcessChannel = make(chan func(string, []string))
 
+func IsInitProcess() bool {
+
+	return len(os.Args) > 1 && os.Args[1] == "_container_init_"
+
+}
+
+func MountBasicFileSystems() {
+
+	// Mount proc filesystem
+	defaultMountFlags := syscall.MS_NOEXEC | syscall.MS_NOSUID | syscall.MS_NODEV
+	syscall.Mount("proc", "/proc", "proc", uintptr(defaultMountFlags), "")
+	syscall.Mount("tmpfs", "/dev", "tmpfs", syscall.MS_NOSUID | syscall.MS_STRICTATIME, "mode=755")
+
+}
+
 // Schedule Init Process
 func init() {
 
@@ -25,10 +40,6 @@ func init() {
 			args = append(args, os.Args[i])
 
 		}
-
-		// Mount proc filesystem
-		// defaultMountFlags := syscall.MS_NOEXEC | syscall.MS_NOSUID | syscall.MS_NODEV
-		// syscall.Mount("proc", "/proc", "proc", uintptr(defaultMountFlags), "")
 
 		go func() {
 
