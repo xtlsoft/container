@@ -12,7 +12,7 @@ func main() {
 
 	if container.IsInitProcess() {
 		
-		cmd, args = container.ParseInit()
+		cmd, args := container.ParseInit()
 
 		fmt.Println("Starting From This")
 		container.MountBasicFileSystems()
@@ -23,7 +23,10 @@ func main() {
 	}
 
 	if len(os.Args) > 1 && os.Args[1] == "new" {
-		fmt.Println("Hello!")
+		r := os.Open("/").Readdir()
+		for _, v := range r {
+			fmt.Println(v.Name())
+		}
 		return
 	}
 
