@@ -23,7 +23,8 @@ func main() {
 	}
 
 	if len(os.Args) > 1 && os.Args[1] == "new" {
-		r := os.Open("/").Readdir()
+		r1, _ := os.Open("/")
+		r, _ := r1.Readdir()
 		for _, v := range r {
 			fmt.Println(v.Name())
 		}
