@@ -49,7 +49,7 @@ func NewAUFS(basePath string) *AUFS {
 		ioutil.WriteFile(filepath.Join(basePath, "aufs.json"), jsonn, os.FileMode(0755))
 	}
 
-	var cnf *AUFSConfig
+	var cnf = new(AUFSConfig)
 	json.Unmarshal(file, cnf)
 
 	var aufs = new(AUFS)
