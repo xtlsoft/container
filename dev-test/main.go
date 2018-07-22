@@ -24,7 +24,7 @@ func main() {
 
 	if len(os.Args) > 1 && os.Args[1] == "new" {
 		r1, _ := os.Open("/")
-		r, _ := r1.Readdir()
+		r, _ := r1.Readdir(1)
 		for _, v := range r {
 			fmt.Println(v.Name())
 		}
@@ -41,7 +41,7 @@ func main() {
 		ApplyIPC().
 		SetPS1("-[Hello Namespace]-")
 
-	cmd := container.NewInitProcess(ns, true, "/proc/self/exe", "new")
+	cmd := container.NewInitProcess(ns, true, "/bin/sh")
 
 	var shares uint64 = 100
 	// var quota int64 = 100
