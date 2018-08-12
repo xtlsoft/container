@@ -1,41 +1,37 @@
 package container
 
 import (
-	"os"
-	"path/filepath"
 	"encoding/json"
 	"io/ioutil"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
 type AUFS struct {
-
-	Config *AUFSConfig
+	Config   *AUFSConfig
 	BasePath string
-
 }
 
 type AUFSConfig struct {
-
-	Layers []string
+	Layers      []string
 	ImageLayers []string
-
 }
 
 func removeFromSlice(slice []string, elems ...string) []string {
-    isInElems := make(map[string]bool)
-    for _, elem := range elems {
-        isInElems[elem] = true
-    }
-    w := 0
-    for _, elem := range slice {
-        if !isInElems[elem] {
-            slice[w] = elem
-            w += 1
-        }
-    }
-    return slice[:w]
+	isInElems := make(map[string]bool)
+	for _, elem := range elems {
+		isInElems[elem] = true
+	}
+	w := 0
+	for _, elem := range slice {
+		if !isInElems[elem] {
+			slice[w] = elem
+			w += 1
+		}
+	}
+	return slice[:w]
 }
 
 func NewAUFS(basePath string) *AUFS {
@@ -120,11 +116,11 @@ func (aufs *AUFS) Mount(topLayer string, path string, additionalLayers ...string
 	layers = append(layers, topLayer)
 
 	for _, v := range additionalLayers {
-		layers = append(layers, v)
+		layers = append(layers, filepath.Join(aufs.BasePath, v))
 	}
 
 	for _, v := range aufs.Config.ImageLayers {
-		layers = append(layers, v)
+		layers = append(layers, filepath.Join(aufs.BasePath, v))
 	}
 
 	var layerArgs = strings.Join(layers, ":")
