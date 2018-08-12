@@ -116,11 +116,11 @@ func (aufs *AUFS) Mount(topLayer string, path string, additionalLayers ...string
 	layers = append(layers, topLayer)
 
 	for _, v := range additionalLayers {
-		layers = append(layers, filepath.Join(aufs.BasePath, v))
+		layers = append(layers, v)
 	}
 
 	for _, v := range aufs.Config.ImageLayers {
-		layers = append(layers, filepath.Join(aufs.BasePath, v))
+		layers = append(layers, v)
 	}
 
 	var layerArgs = strings.Join(layers, ":")
